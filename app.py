@@ -43,75 +43,82 @@ def main():
 
     st.sidebar.info("Choose the original `movies.csv`")
     filename = st.sidebar.selectbox(
-        "Choose dataset",
+        "Choose first dataset",
         glob.glob("data/*.csv"),
     )
 
     df = get_data(filename)
 
+    st.sidebar.info("Choose the original `rating.csv`")
+    filename_rating = st.sidebar.selectbox(
+        "Choose second dataset",
+        glob.glob("data/*.csv"),
+    )
+
+    df_rating = get_data(filename_rating)
+
     "Here's a sample sample of the raw dataset"
     st.table(df.head())
     f"Total of ${df.shape[0]}$ records"
 
-    if filename == "data/movies.csv":
-        st.subheader("Year Extraction")
-        """
-            The first step is to include a year by
-            extracting it from the title (_and subsequently remove the year from the title_)
-        """
+    st.subheader("Year Extraction")
+    """
+        The first step is to include a year by
+        extracting it from the title (_and subsequently remove the year from the title_)
+    """
 
-        df.loc[:, 'name'] = df.title.str.replace(r'\(\d{4}\)', '').str.strip()
-        df.loc[:, 'year'] = df.title.str.extract(r'(\d{4})', expand=False)
-        st.dataframe(df.head(10))
+    df.loc[:, 'name'] = df.title.str.replace(r'\(\d{4}\)', '').str.strip()
+    df.loc[:, 'year'] = df.title.str.extract(r'(\d{4})', expand=False)
+    st.dataframe(df.head(10))
 
-        st.subheader("One Hot Encoding")
-        """
-                        The next step is to create a one-hot encoding for the genres
-                        Consider a function $F(x)$, where $x \in X$, where $X$ is
-                        the set of all possible genre combinations. Now, $F$ is defined as:
-                        $$
-                            F: X \\rightarrow Y,F(x \in X) = y \in Y
-                        $$
-                        where $y$ is defined as a vector such that $y(i) = 1$ if a
-                        genre, x(i) is present for a movie. Thus the elements of $y$
-                        act as a bitmask for the set of genres $G$, such that all $x(i) \in G$
-        """
+    st.subheader("One Hot Encoding")
+    """
+                    The next step is to create a one-hot encoding for the genres
+                    Consider a function $F(x)$, where $x \in X$, where $X$ is
+                    the set of all possible genre combinations. Now, $F$ is defined as:
+                    $$
+                        F: X \\rightarrow Y,F(x \in X) = y \in Y
+                    $$
+                    where $y$ is defined as a vector such that $y(i) = 1$ if a
+                    genre, x(i) is present for a movie. Thus the elements of $y$
+                    act as a bitmask for the set of genres $G$, such that all $x(i) \in G$
+    """
 
-        import numpy as np
+    import numpy as np
 
-        genre_df, genres = get_onehot(df, return_genres=True)
+    genre_df, genres = get_onehot(df, return_genres=True)
 
-        "$x(i) \in G, G =$"
-        genres
+    "$x(i) \in G, G =$"
+    genres
 
-        "The one hot encoding, thus, is something like this"
-        st.table(genre_df.head(10))
-        f"`Actual shape: {genre_df.shape}`"
+    "The one hot encoding, thus, is something like this"
+    st.table(genre_df.head(10))
+    f"`Actual shape: {genre_df.shape}`"
 
-        """
-            Modifying the original dataframe by including this new genre matrix,
-            (additionally, just joining the `links.csv` data), we have our initial dataset
-        """
-        dataset = pd.concat([df, pd.read_csv("data/links.csv", index_col=0), genre_df], axis=1)
-        del dataset['genres']
-        del dataset['title']
-        st.dataframe(dataset.head(10))
-        cols = list(dataset.columns)
-        st.write(f"This dataset has ${dataset.shape[0]}$ records and {cols} fields")
+    """
+        Modifying the original dataframe by including this new genre matrix,
+        (additionally, just joining the `links.csv` data), we have our initial dataset
+    """
+    dataset = pd.concat([df, pd.read_csv("data/links.csv", index_col=0), genre_df], axis=1)
+    del dataset['genres']
+    del dataset['title']
+    st.dataframe(dataset.head(10))
+    cols = list(dataset.columns)
+    st.write(f"This dataset has ${dataset.shape[0]}$ records and {cols} fields")
 
+    "Here's a sample sample of the raw dataset"
+    st.table(df_rating.head())
+    f"Total of ${df_rating.shape[0]}$ records"
 
-    elif filename == "data/ratings.csv":
-        st.header("Additional features")
+    st.header("Additional features")
 
-        st.subheader("User count")
-        """
-            Now that we have a basic data set with one hot encoded genres and averate rating, the next step
-            is to add additional information from the `ratings.csv` and optionally
-            `genome-*.csv`.
-        """
-        average_rating = df["rating"].mean(axis=0)
-        f"`Average Rating Overall: {average_rating}`"
+    st.subheader("Average rating and user count")
+    average_rating = df_rating["rating"].mean(axis=0)
+    f"`Average Rating Overall: {average_rating}`"
 
+    rows = list(df_rating.index.values)
+    distinct_rows = set(rows)
+    f"`User count: {len(distinct_rows)}`"
 
 if __name__ == "__main__":
     main()
