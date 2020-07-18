@@ -16,6 +16,7 @@ def get_data(filename: str, index_col: int = 0, parse_dates: bool = True):
     df = pd.read_csv(filename, index_col=0)
     return df
 
+
 def get_onehot(df: pd.DataFrame, return_genres=False) -> pd.DataFrame:
     """Create a one-hot encoding of genres"""
     try:
@@ -31,6 +32,27 @@ def get_onehot(df: pd.DataFrame, return_genres=False) -> pd.DataFrame:
             return genre_df, genres
         return genre_df
 
+
+@st.cache()
+def get_dataset(df: pd.DataFrame, genre_df: pd.DataFrame) -> pd.DataFrame:
+    """Returns aggegrated dataset with all basic fields"""
+    dataset = pd.concat([df, pd.read_csv("data/links.csv", index_col=0), genre_df], axis=1)
+    del dataset['genres']
+    del dataset['title']
+    return dataset
+
+
+@st.cache()
+def get_ratings(dataset: pd.DataFrame, genres: list) -> pd.DataFrame:
+    """Add average rating and count values"""
+    rating = pd.read_csv("data/ratings.csv")
+    rating_mean = rating.groupby('movieId').mean().rating.rename('rating')
+    rating_count = rating.groupby('movieId').count().rating.rename('co')
+    _df = pd.concat([rating_mean, rating_count, dataset], axis=1)
+    cols = set(list(_df.columns))
+    return _df.loc[:, list(cols - set(genres)) + genres].dropna()
+
+
 def main():
     st.title("Recommender System")
     st.header("Loading the data")
@@ -43,11 +65,17 @@ def main():
 
     st.sidebar.info("Choose the original `movies.csv`")
     filename = st.sidebar.selectbox(
-        "Choose dataset",
+        "Choose first dataset",
         glob.glob("data/*.csv"),
     )
 
     df = get_data(filename)
+
+    st.sidebar.info("Choose the original `rating.csv`")
+    filename_rating = st.sidebar.selectbox(
+        "Choose second dataset",
+        glob.glob("data/*.csv"),
+    )
 
     "Here's a sample sample of the raw dataset"
     st.table(df.head())
@@ -75,39 +103,30 @@ def main():
                     genre, x(i) is present for a movie. Thus the elements of $y$
                     act as a bitmask for the set of genres $G$, such that all $x(i) \in G$
     """
-
-    import numpy as np
-
     genre_df, genres = get_onehot(df, return_genres=True)
 
     "$x(i) \in G, G =$"
     genres
 
     "The one hot encoding, thus, is something like this"
-    st.table(genre_df.head(10))
+    st.table(genre_df.T.head(10))
     f"`Actual shape: {genre_df.shape}`"
 
     """
         Modifying the original dataframe by including this new genre matrix,
         (additionally, just joining the `links.csv` data), we have our initial dataset
     """
-    dataset = pd.concat([df, pd.read_csv("data/links.csv", index_col=0), genre_df], axis=1)
-    del dataset['genres']
-    del dataset['title']
+    dataset = get_dataset(df, genre_df)
     st.dataframe(dataset.head(10))
     cols = list(dataset.columns)
     st.write(f"This dataset has ${dataset.shape[0]}$ records and {cols} fields")
 
-    st.header("Additional features")
+    st.header("Additional Features")
+    st.subheader("Average rating and user count")
 
-    st.subheader("Average ratings and user count")
-
-    """
-        Now that we have a basic data set with one hot encoded genres, the next step
-        is to add additional information from the `ratings.csv` and optionally
-        `genome-*.csv`.
-    """
-
+    final_df = get_ratings(dataset, genres)
+    st.dataframe(final_df.head(10))
+    f"The final prepared dataset has ${final_df.shape[0]}$ records"
 
 if __name__ == "__main__":
     main()

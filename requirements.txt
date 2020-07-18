@@ -11,8 +11,8 @@ backcall==0.2.0           # via ipython
 base58==2.0.1             # via streamlit
 bleach==3.1.5             # via nbconvert
 blinker==1.4              # via streamlit
-boto3==1.14.21            # via streamlit
-botocore==1.17.21         # via boto3, s3transfer, streamlit
+boto3==1.14.22            # via streamlit
+botocore==1.17.22         # via boto3, s3transfer, streamlit
 cachetools==4.1.1         # via streamlit
 certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
@@ -38,7 +38,7 @@ jupyter-client==6.1.6     # via ipykernel, notebook
 jupyter-core==4.6.3       # via jupyter-client, nbconvert, nbformat, notebook
 kiwisolver==1.2.0         # via matplotlib
 markupsafe==1.1.1         # via jinja2
-matplotlib==3.2.2         # via seaborn
+matplotlib==3.3.0         # via seaborn
 mistune==0.8.4            # via nbconvert
 nbconvert==5.6.1          # via notebook
 nbformat==5.0.7           # via ipywidgets, nbconvert, notebook
@@ -51,7 +51,7 @@ parso==0.7.0              # via jedi
 pathtools==0.1.2          # via watchdog
 pexpect==4.8.0            # via ipython
 pickleshare==0.7.5        # via ipython
-pillow==7.2.0             # via streamlit
+pillow==7.2.0             # via matplotlib, streamlit
 prometheus-client==0.8.0  # via notebook
 prompt-toolkit==3.0.5     # via ipython
 protobuf==3.12.2          # via streamlit
@@ -80,7 +80,7 @@ tornado==6.0.4            # via ipykernel, jupyter-client, notebook, streamlit, 
 traitlets==4.3.3          # via ipykernel, ipython, ipywidgets, jupyter-client, jupyter-core, nbconvert, nbformat, notebook, pydeck
 tzlocal==2.1              # via streamlit
 urllib3==1.25.9           # via botocore, requests
-validators==0.15.0        # via streamlit
+validators==0.16.0        # via streamlit
 watchdog==0.10.3          # via streamlit
 wcwidth==0.2.5            # via prompt-toolkit
 webencodings==0.5.1       # via bleach
