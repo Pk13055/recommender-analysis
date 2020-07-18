@@ -128,6 +128,23 @@ def main():
     st.dataframe(final_df.head(10))
     f"The final prepared dataset has ${final_df.shape[0]}$ records"
 
+    st.subheader("Fetching additional information using `imdbId`")
+
+    st.write("`TODO: add imdb fetching of details`")
+
+    st.header("Visualization")
+
+    # TODO: visualization is to be added here
+    # first choose two subsets of data, ie, a different combination of genres
+    # (NOTE use `joinplot` for this)
+    # https://seaborn.pydata.org/generated/seaborn.jointplot.html
+    # - year vs rating
+    # - year vs count
+    # - rating vs count
+    # - Additional info (from imdb) vs existing fields
+    # (NOTE: the genre based comparisons can also be done)
+
+
 if __name__ == "__main__":
     main()
 
