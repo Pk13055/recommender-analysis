@@ -109,7 +109,7 @@ def main():
     genres
 
     "The one hot encoding, thus, is something like this"
-    st.table(genre_df.T.head(10))
+    st.table(genre_df.head(10).T)
     f"`Actual shape: {genre_df.shape}`"
 
     """
